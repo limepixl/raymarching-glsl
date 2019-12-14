@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <glad/glad.h>
+#include <sys/stat.h>   // Only on POSIX/Linux
+#include <ctime>
 
 // Load whole file as a string
 // NOTE: May not work correctly on Windows (ftell can return >= size)
@@ -82,4 +84,26 @@ void Shader::LoadShader(const char* vertexPath, const char* fragmentPath)
 void Shader::UseShader()
 {
     glUseProgram(ID);
+}
+
+// NOTE: This function does not work correctly on non-Linux operating systems
+bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
+{
+    struct stat sb;
+
+    lstat(vertexPath, &sb);
+    long vertexTime = sb.st_mtime;
+
+    lstat(fragmentPath, &sb);
+    long fragmentTime = sb.st_mtime;
+
+    bool hasChanged = lastVertexTime != vertexTime || lastFragmentTime != fragmentTime;
+    if(hasChanged)
+    {
+        LoadShader(vertexPath, fragmentPath);
+        lastVertexTime = vertexTime;
+        lastFragmentTime = fragmentTime;
+    }
+
+    return hasChanged;
 }

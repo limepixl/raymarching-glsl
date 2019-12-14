@@ -34,8 +34,12 @@ int main()
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
 
+    // Shader paths
+    const char* vertexPath = "res/shaders/vertex.glsl";
+    const char* fragmentPath = "res/shaders/fragment.glsl";
+
     Shader basicShader;
-    basicShader.LoadShader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+    basicShader.LoadShader(vertexPath, fragmentPath);
     basicShader.UseShader();
 
     float positions[]
@@ -66,6 +70,8 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+        if(basicShader.CheckChanged(vertexPath, fragmentPath))
+            basicShader.UseShader();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
