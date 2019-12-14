@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/home/stefan/dev/projects/glsl-viewer/build",
+  "command": "/bin/gcc-9 -DGLFW_DLL -I../glad-46/include  -g   -o CMakeFiles/glsl-viewer.dir/glad-46/src/glad.c.o   -c /home/stefan/dev/projects/glsl-viewer/glad-46/src/glad.c",
+  "file": "/home/stefan/dev/projects/glsl-viewer/glad-46/src/glad.c"
+},
+
+{
+  "directory": "/home/stefan/dev/projects/glsl-viewer/build",
+  "command": "/bin/g++-9  -DGLFW_DLL -I../glad-46/include  -g -Wall -g3   -o CMakeFiles/glsl-viewer.dir/src/main.cpp.o -c /home/stefan/dev/projects/glsl-viewer/src/main.cpp",
+  "file": "/home/stefan/dev/projects/glsl-viewer/src/main.cpp"
+}
+]
