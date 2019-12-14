@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <cstdio>
+#include "Shader/shader.hpp"
 
 int main()
 {
@@ -8,6 +9,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
     const int WIDTH = 800;
     const int HEIGHT = 600;
@@ -28,6 +30,10 @@ int main()
     }
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+
+    Shader basicShader;
+    basicShader.LoadShader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
+    basicShader.UseShader();
 
     while(!glfwWindowShouldClose(window))
     {
