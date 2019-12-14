@@ -3,6 +3,8 @@
 #include <cstdlib>
 #include <glad/glad.h>
 
+// Load whole file as a string
+// NOTE: May not work correctly on Windows (ftell can return >= size)
 char* loadFromFile(const char* shaderPath)
 {
     long size;
@@ -27,6 +29,7 @@ char* loadFromFile(const char* shaderPath)
     return buffer;
 }
 
+// Load shaders and create a shader program
 void Shader::LoadShader(const char* vertexPath, const char* fragmentPath)
 {
     char* vertexSource = loadFromFile(vertexPath);
