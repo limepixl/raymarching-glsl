@@ -1,5 +1,0 @@
-/home/stefan/dev/projects/glsl-viewer/build/CMakeFiles/rebuild_cache.dir
-/home/stefan/dev/projects/glsl-viewer/build/CMakeFiles/edit_cache.dir
-/home/stefan/dev/projects/glsl-viewer/build/CMakeFiles/glsl-viewer.dir
-/home/stefan/dev/projects/glsl-viewer/build/CMakeFiles/package_source.dir
-/home/stefan/dev/projects/glsl-viewer/build/CMakeFiles/package.dir
