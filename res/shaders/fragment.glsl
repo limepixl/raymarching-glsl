@@ -1,6 +1,7 @@
 #version 460 core
 out vec4 color;
 uniform vec2 windowSize;
+uniform vec4 borders;
 
 float map(float current, float oldX, float oldY, float newX, float newY)
 {
@@ -12,8 +13,8 @@ void main()
     int iterations = 100;
     vec2 fragPos = gl_FragCoord.xy;
 
-    float cx = map(fragPos.x, 0.0, windowSize.x, -2.0, 0.5);
-    float cy = map(fragPos.y, 0.0, windowSize.y, -1.25, 1.25);
+    float cx = map(fragPos.x, 0.0, windowSize.x, borders.x, borders.y);
+    float cy = map(fragPos.y, 0.0, windowSize.y, borders.z, borders.w);
 
     float zx = 0;
     float zy = 0;
@@ -29,12 +30,10 @@ void main()
         zx = tempZX;
         zy = tempZY;
 
-        color = vec4(0.0, val, 0.0, 1.0);
+        color = vec4(val, 0.0, 0.0, 1.0);
 
         float dist = distance(vec2(zx, zy), vec2(0.0, 0.0));
         if(dist > 2)
-        {
             break;
-        }
     }
 }

@@ -13,8 +13,8 @@ int main()
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
     // Window creation
-    const int WIDTH = 500;
-    const int HEIGHT = 500;
+    const int WIDTH = 1000;
+    const int HEIGHT = 1000;
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "GLSL viewer", nullptr, nullptr);
     if(window == nullptr)
     {
@@ -64,8 +64,14 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // Location used for window size uniform
-    int loc = glGetUniformLocation(basicShader.ID, "windowSize");
+    int loc = glGetUniformLocation(basicShader.ID, "windowSize");   // Window size uniform
+    int loc2 = glGetUniformLocation(basicShader.ID, "borders");     // Mandelbrot borders uniform
+
+    float x0 = -2.0f;
+    float x1 = 0.5f;
+    float y0 = -1.25f;
+    float y1 = 1.25f;
+    float diff = 0.001f;
 
     // Render loop
     while(!glfwWindowShouldClose(window))
@@ -76,11 +82,13 @@ int main()
         if(basicShader.CheckChanged(vertexPath, fragmentPath))
         {
             basicShader.UseShader();
-            loc = glGetUniformLocation(basicShader.ID, "windowSize");   // Update location
         }
 
         // Pass screen coordinates to shader
         glUniform2f(loc, (float) WIDTH, (float) HEIGHT);
+
+        // Pass the borders to the shader
+        glUniform4f(loc2, x0 += diff, x1 -= diff, y0 += diff, y1 -= diff);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
