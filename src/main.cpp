@@ -64,6 +64,9 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
+    // Location used for window size uniform
+    int loc = glGetUniformLocation(basicShader.ID, "windowSize");
+
     // Render loop
     while(!glfwWindowShouldClose(window))
     {
@@ -71,7 +74,13 @@ int main()
 
         glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
         if(basicShader.CheckChanged(vertexPath, fragmentPath))
+        {
             basicShader.UseShader();
+            loc = glGetUniformLocation(basicShader.ID, "windowSize");   // Update location
+        }
+
+        // Pass screen coordinates to shader
+        glUniform2f(loc, (float) WIDTH, (float) HEIGHT);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
