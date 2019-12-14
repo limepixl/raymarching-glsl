@@ -11,8 +11,8 @@ int main()
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
-    const int WIDTH = 800;
-    const int HEIGHT = 600;
+    const int WIDTH = 500;
+    const int HEIGHT = 500;
     GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "GLSL viewer", nullptr, nullptr);
     if(window == nullptr)
     {
@@ -35,11 +35,33 @@ int main()
     basicShader.LoadShader("res/shaders/vertex.glsl", "res/shaders/fragment.glsl");
     basicShader.UseShader();
 
+    float positions[]
+    {
+        -1.0f, -1.0f,
+         1.0f, -1.0f,
+         1.0f,  1.0f,
+         1.0f,  1.0f,
+        -1.0f,  1.0f,
+        -1.0f, -1.0f
+    };
+
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+    glBindVertexArray(VAO);
+
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(positions), positions, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+
     while(!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // render
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
