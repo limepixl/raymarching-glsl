@@ -1,7 +1,6 @@
 #version 460 core
 out vec4 color;
 uniform vec2 windowSize;
-uniform vec4 borders;
 
 float map(float current, float oldX, float oldY, float newX, float newY)
 {
@@ -10,6 +9,7 @@ float map(float current, float oldX, float oldY, float newX, float newY)
 
 void main()
 {
+    vec4 borders = vec4(-2.0, 0.5, -1.25, 1.25);
     int iterations = 100;
     vec2 fragPos = gl_FragCoord.xy;
 
