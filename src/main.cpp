@@ -1,38 +1,12 @@
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <cstdio>
 #include "Shader/shader.hpp"
+#include "Display/display.hpp"
 
 int main()
 {
-    // GLFW init
-    glfwInit();
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
-
-    // Window creation
     const int WIDTH = 1000;
     const int HEIGHT = 1000;
-    GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "GLSL viewer", nullptr, nullptr);
-    if(window == nullptr)
-    {
-        printf("Failed to create GLFW window!\n");
-        glfwTerminate();
-        return -1;
-    }
-    glfwMakeContextCurrent(window);
-
-    // GLAD init and viewport config
-    if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        printf("Failed to initialize GLAD!\n");
-        glfwTerminate();
-        return -1;
-    }
-    glViewport(0, 0, WIDTH, HEIGHT);
-    glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+    Display display(WIDTH, HEIGHT);
 
     // Shader paths
     const char* vertexPath = "res/shaders/vertex.glsl";
@@ -74,15 +48,13 @@ int main()
     float diff = 0.001f;
 
     // Render loop
-    while(!glfwWindowShouldClose(window))
+    while(display.IsOpen())
     {
         glClear(GL_COLOR_BUFFER_BIT);
 
         glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
         if(basicShader.CheckChanged(vertexPath, fragmentPath))
-        {
             basicShader.UseShader();
-        }
 
         // Pass screen coordinates to shader
         glUniform2f(loc, (float) WIDTH, (float) HEIGHT);
@@ -90,10 +62,8 @@ int main()
         // Pass the borders to the shader
         glUniform4f(loc2, x0 += diff, x1 -= diff, y0 += diff, y1 -= diff);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+        display.Update();
     }
 
-    glfwTerminate();
     return 0;
 }
