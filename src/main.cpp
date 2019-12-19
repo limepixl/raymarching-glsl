@@ -5,8 +5,6 @@
 #include <cstdio>
 #include <cmath>
 
-
-
 int main()
 {
     const int WIDTH = 1000;
