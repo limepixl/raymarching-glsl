@@ -73,7 +73,6 @@ void main()
     vec3 direction = normalize(vec3(uv.x, uv.y, -1));
 
     float dist = March(center, direction);
-
     vec3 point = center + dist*direction;
 
     // Simple point light
@@ -85,6 +84,14 @@ void main()
     vec3 normalVector = GetNormal(point);
     float diffuse = max(0.0, dot(lightDir, normalVector));
 
-    vec3 ambient = vec3(0.0);
+    vec3 ambient = vec3(0.1);
+
+    // Raymarch towards the light to see if point is in shadow
+    // Raising the point that the raymarch starts from because the 
+    // marching ends right away if it starts at the found point from the last march.
+    float distToLight = March(point + normalVector * MINDISTANCE*2.0, normalize(lightPos - point));
+    if(distToLight < length(lightPos - point))
+        diff *= 0.1;    // Why?
+
     color = vec4(diffuse * vec3(1.0) + ambient, 1.0);
 }
