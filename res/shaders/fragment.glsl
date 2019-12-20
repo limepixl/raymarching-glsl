@@ -1,6 +1,7 @@
 #version 460 core
 out vec4 color;
 uniform vec2 windowSize;
+uniform float time;
 
 const int MAXSTEPS = 500;
 const float MINDISTANCE = 0.01;
@@ -24,8 +25,8 @@ float boxSDF(vec3 point, vec3 box)
 
 float SceneDist(vec3 point)
 {
-    vec4 sphere = vec4(1.0, 1.0, -6.0, 1.0);
-    vec4 sphere2 = vec4(-1.0, 1.0, -5.9, 1.0);
+    vec4 sphere = vec4(1.1, 1.0, -6.0, 1.0);
+    vec4 sphere2 = vec4(-1.1, 1.0, -6.0, 1.0);
     float sphereDist1 = sphereSDF(point, sphere);
     float sphereDist2 = sphereSDF(point, sphere2);
     float planeDist = point.y;
@@ -57,9 +58,9 @@ vec3 GetNormal(vec3 point)
     float dist = SceneDist(point);
     float delta = 0.01;   // Used for secant point2
 
-    vec3 n = vec3(dist - SceneDist(point - vec3(delta, 0.0, 0.0)),
-                  dist - SceneDist(point - vec3(0.0, delta, 0.0)),
-                  dist - SceneDist(point - vec3(0.0, 0.0, delta)));
+    vec3 n = dist - vec3(SceneDist(point - vec3(delta, 0.0, 0.0)),
+                  SceneDist(point - vec3(0.0, delta, 0.0)),
+                  SceneDist(point - vec3(0.0, 0.0, delta)));
 
     return normalize(n);
 }
@@ -77,6 +78,9 @@ void main()
 
     // Simple point light
     vec3 lightPos = vec3(0.0, 10.0, -1.0);
+    lightPos.x += 10.0 * sin(time);
+    lightPos.z += 10.0 * cos(time);
+
     vec3 lightDir = normalize(lightPos - point);
     vec3 normalVector = GetNormal(point);
     float diffuse = max(0.0, dot(lightDir, normalVector));

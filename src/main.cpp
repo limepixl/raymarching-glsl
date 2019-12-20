@@ -42,6 +42,7 @@ int main()
     glEnableVertexAttribArray(0);
 
     int loc1 = glGetUniformLocation(basicShader.ID, "windowSize");   // Window size uniform
+    int loc2 = glGetUniformLocation(basicShader.ID, "time");         // Time
 
     // Render loop
     while(display.IsOpen())
@@ -54,6 +55,9 @@ int main()
 
         // Pass screen coordinates to shader
         glUniform2f(loc1, (float) WIDTH, (float) HEIGHT);
+
+        // Pass glfw time to shader
+        glUniform1f(loc2, (float) glfwGetTime());
 
         display.Update();
     }
