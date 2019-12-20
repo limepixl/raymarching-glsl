@@ -7,11 +7,6 @@ const int MAXSTEPS = 500;
 const float MINDISTANCE = 0.01;
 const float MAXDISTANCE = 100.0;
 
-float map(float current, float oldX, float oldY, float newX, float newY)
-{
-    return (current.x - oldX) / (oldY - oldX) * (newY - newX) + newX;
-}
-
 float sphereSDF(vec3 point, vec4 sphereData)
 {
     return length(point - sphereData.xyz) - sphereData.w;
@@ -23,6 +18,7 @@ float boxSDF(vec3 point, vec3 box)
     return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - 0.1;
 }
 
+// Returns the distance to the closest hit
 float SceneDist(vec3 point)
 {
     vec4 sphere = vec4(1.1, 1.0, -6.0, 1.0);
@@ -45,6 +41,8 @@ float March(vec3 origin, vec3 direction)
 
         currentDistance += dist;
 
+        // If marching very close to object, OR
+        // marching towards infinity
         if(dist < MINDISTANCE || dist > MAXDISTANCE)
             break;
     }
@@ -91,7 +89,8 @@ void main()
     // marching ends right away if it starts at the found point from the last march.
     float distToLight = March(point + normalVector * MINDISTANCE*2.0, normalize(lightPos - point));
     if(distToLight < length(lightPos - point))
-        diff *= 0.1;    // Why?
+        diffuse *= 0.1;
 
-    color = vec4(diffuse * vec3(1.0) + ambient, 1.0);
+    vec3 objectColor = vec3(1.0);
+    color = vec4(diffuse * objectColor, 1.0);
 }
