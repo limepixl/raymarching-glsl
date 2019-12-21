@@ -12,8 +12,8 @@ int main()
     Display display(WIDTH, HEIGHT);
 
     // Shader paths
-    const char* vertexPath = "res/shaders/vertex.glsl";
-    const char* fragmentPath = "res/shaders/fragment.glsl";
+    const char* vertexPath = "../../../res/shaders/vertex.glsl";
+    const char* fragmentPath = "../../../res/shaders/fragment.glsl";
 
     Shader basicShader;
     basicShader.LoadShader(vertexPath, fragmentPath);
@@ -49,10 +49,7 @@ int main()
     {
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);
-
-        if(basicShader.CheckChanged(vertexPath, fragmentPath))
-            basicShader.UseShader();
-
+        
         // Pass screen coordinates to shader
         glUniform2f(loc1, (float) WIDTH, (float) HEIGHT);
 

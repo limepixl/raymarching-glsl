@@ -2,23 +2,22 @@
 #include <cstdio>
 #include <cstdlib>
 #include <glad/glad.h>
-#include <sys/stat.h>   // Only on POSIX/Linux
 #include <ctime>
 
 // Load whole file as a string
 // NOTE: May not work correctly on Windows (ftell can return >= size)
 char* loadFromFile(const char* shaderPath)
 {
-    long size;
-    char* buffer = nullptr;
+    size_t size;
+    char* buffer = NULL;
 
-    FILE* vRaw = fopen(shaderPath, "r");
+    FILE* vRaw = fopen(shaderPath, "rb");
     if(vRaw == nullptr)
         printf("Failed to open VERTEX shader file!\n");
     else
     {
         fseek(vRaw, 0L, SEEK_END);
-        size = ftell(vRaw);
+        size = (size_t)ftell(vRaw);
         rewind(vRaw);
 
         buffer = (char*)malloc(size + 1);   // +1 for \0
@@ -86,7 +85,42 @@ void Shader::UseShader()
     glUseProgram(ID);
 }
 
+// Windows implementation of the function below
+#include <Windows.h>
+bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
+{
+    HANDLE vRaw = CreateFile(vertexPath, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    HANDLE fRaw = CreateFile(fragmentPath, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+
+    FILETIME vertexTime, fragmentTime;
+    GetFileTime(vRaw, NULL, NULL, &vertexTime);
+    GetFileTime(fRaw, NULL, NULL, &fragmentTime);
+
+    ULARGE_INTEGER vertexLarge;
+    vertexLarge.LowPart = vertexTime.dwLowDateTime;
+    vertexLarge.HighPart = vertexTime.dwHighDateTime;
+    unsigned long currentVertexTime = vertexLarge.QuadPart;
+
+    ULARGE_INTEGER fragmentLarge;
+    fragmentLarge.LowPart = fragmentTime.dwLowDateTime;
+    fragmentLarge.HighPart = fragmentTime.dwHighDateTime;
+    unsigned long currentFragmentTime = vertexLarge.QuadPart;
+
+    printf("%lu %lu\n", currentVertexTime, currentFragmentTime);
+
+    bool hasChanged = currentVertexTime != lastVertexTime || currentFragmentTime != lastFragmentTime;
+    if(hasChanged)
+    {
+        LoadShader(vertexPath, fragmentPath);
+        lastVertexTime = currentVertexTime;
+        lastFragmentTime = currentFragmentTime;
+    }
+
+    return hasChanged;
+}
+
 // NOTE: This function does not work correctly on non-Linux operating systems
+/* #include <sys/stat.h>   // Only on POSIX/Linux
 bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
 {
     struct stat sb;
@@ -107,3 +141,4 @@ bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
 
     return hasChanged;
 }
+*/
