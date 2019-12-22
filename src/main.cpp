@@ -49,6 +49,9 @@ int main()
     {
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);
+
+        if(basicShader.CheckChanged(vertexPath, fragmentPath))
+            basicShader.UseShader();
         
         // Pass screen coordinates to shader
         glUniform2f(loc1, (float) WIDTH, (float) HEIGHT);

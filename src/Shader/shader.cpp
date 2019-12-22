@@ -5,7 +5,6 @@
 #include <ctime>
 
 // Load whole file as a string
-// NOTE: May not work correctly on Windows (ftell can return >= size)
 char* loadFromFile(const char* shaderPath)
 {
     size_t size;
@@ -13,7 +12,7 @@ char* loadFromFile(const char* shaderPath)
 
     FILE* vRaw = fopen(shaderPath, "rb");
     if(vRaw == nullptr)
-        printf("Failed to open VERTEX shader file!\n");
+        printf("Failed to open shader file! Path: %s\n", shaderPath);
     else
     {
         fseek(vRaw, 0L, SEEK_END);
@@ -89,12 +88,12 @@ void Shader::UseShader()
 #include <Windows.h>
 bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
 {
-    HANDLE vRaw = CreateFile(vertexPath, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    HANDLE fRaw = CreateFile(fragmentPath, 0, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+    WIN32_FILE_ATTRIBUTE_DATA vertexData, fragmentData;
+    GetFileAttributesEx(vertexPath, GetFileExInfoStandard, &vertexData);
+    GetFileAttributesEx(fragmentPath, GetFileExInfoStandard, &fragmentData);
 
-    FILETIME vertexTime, fragmentTime;
-    GetFileTime(vRaw, NULL, NULL, &vertexTime);
-    GetFileTime(fRaw, NULL, NULL, &fragmentTime);
+    FILETIME vertexTime = vertexData.ftLastWriteTime;
+    FILETIME fragmentTime = fragmentData.ftLastWriteTime;
 
     ULARGE_INTEGER vertexLarge;
     vertexLarge.LowPart = vertexTime.dwLowDateTime;
@@ -104,9 +103,7 @@ bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
     ULARGE_INTEGER fragmentLarge;
     fragmentLarge.LowPart = fragmentTime.dwLowDateTime;
     fragmentLarge.HighPart = fragmentTime.dwHighDateTime;
-    unsigned long currentFragmentTime = vertexLarge.QuadPart;
-
-    printf("%lu %lu\n", currentVertexTime, currentFragmentTime);
+    unsigned long currentFragmentTime = fragmentLarge.QuadPart;
 
     bool hasChanged = currentVertexTime != lastVertexTime || currentFragmentTime != lastFragmentTime;
     if(hasChanged)
