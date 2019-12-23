@@ -7,27 +7,49 @@ const int MAXSTEPS = 500;
 const float MINDISTANCE = 0.01;
 const float MAXDISTANCE = 100.0;
 
-float sphereSDF(vec3 point, vec4 sphereData)
+mat2 Rotate(float angle)
 {
-    return length(point - sphereData.xyz) - sphereData.w;
+	float sine = sin(angle);
+	float cosine = cos(angle);
+	
+	return mat2(cosine, -sine, sine, cosine);
 }
 
-float boxSDF(vec3 point, vec3 box)
+float sphereSDF(vec3 point, float radius)
 {
-    vec3 q = abs(point) - box;
-    return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - 0.1;
+    return length(point) - radius;
+}
+
+float pillSDF(vec3 point, vec3 A, vec3 B, float radius)
+{
+	vec3 AB = B - A;
+	vec3 AP = point - A;
+	
+	float part = dot(AP, AB) / dot(AB, AB);
+	part = clamp(part, 0, 1);
+	vec3 linePoint = A + part * AB;
+	
+	float dist = length(point - linePoint) - radius;
+	return dist;
+}
+
+float torusSDF(vec3 point, vec3 center, float r1, float r2)
+{
+	vec2 pXZ = point.xz;
+	float x = length(pXZ) - r1;
+	float y = point.y;
+	
+	float dist = length(vec2(x, y)) - r2;
+	return dist;
 }
 
 // Returns the distance to the closest hit
 float SceneDist(vec3 point)
-{
-    vec4 sphere = vec4(1.1, 1.0, -6.0, 1.0);
-    vec4 sphere2 = vec4(-1.1, 1.0, -6.0, 1.0);
-    float sphereDist1 = sphereSDF(point, sphere);
-    float sphereDist2 = sphereSDF(point, sphere2);
+{	
+    float torusDist = torusSDF(point - vec3(0.0, 0.5, -6.0), vec3(0.0, 1.0, -6.0), 1.0, 0.1);
     float planeDist = point.y;
 
-    float minDist = min(min(sphereDist1, sphereDist2), planeDist);
+    float minDist = min(torusDist, planeDist);
     return minDist;
 }
 
