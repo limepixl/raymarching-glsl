@@ -2,6 +2,7 @@
 out vec4 color;
 uniform vec2 windowSize;
 uniform float time;
+uniform vec3 cameraPosition;
 
 const int MAXSTEPS = 500;
 const float MINDISTANCE = 0.01;
@@ -87,13 +88,13 @@ vec3 GetNormal(vec3 point)
 
 void main()
 {
-    vec2 uv = (gl_FragCoord.xy - 0.5 * windowSize.xy) / windowSize.y;
+    vec2 fragCoord = gl_FragCoord.xy ;
+    vec2 uv = (fragCoord - 0.5 * windowSize.xy) / windowSize.y;
 
-    vec3 center = vec3(0.0, 1.0, 0.0);
     vec3 direction = normalize(vec3(uv.x, uv.y, -1));
 
-    float dist = March(center, direction);
-    vec3 point = center + dist*direction;
+    float dist = March(cameraPosition, direction);
+    vec3 point = cameraPosition + dist*direction;
 
     // Simple point light
     vec3 lightPos = vec3(0.0, 10.0, -1.0);

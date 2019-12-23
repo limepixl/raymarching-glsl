@@ -19,6 +19,7 @@ Display::Display(int width, int height) : width(width), height(height)
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Bind cursor within screen 
 
     // GLAD init and viewport config
     if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -28,6 +29,10 @@ Display::Display(int width, int height) : width(width), height(height)
     }
     glViewport(0, 0, width, height);
     glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
+
+    // Used for delta time calculations
+    deltaTime = 0.0f;
+    lastTime = 0.0f;
 }
 
 Display::~Display()
@@ -42,6 +47,11 @@ bool Display::IsOpen()
 
 void Display::Update()
 {
+    // Calculate deltaTime
+    float currentTime = (float)glfwGetTime();
+    deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+
     glfwSwapBuffers(window);
     glfwPollEvents();
 }

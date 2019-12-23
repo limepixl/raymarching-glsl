@@ -1,6 +1,7 @@
 #include <glad/glad.h>
 #include "Shader/shader.hpp"
 #include "Display/display.hpp"
+#include "Math/math.hpp"
 #include <GLFW/glfw3.h>
 #include <cstdio>
 #include <cmath>
@@ -43,6 +44,13 @@ int main()
 
     int loc1 = glGetUniformLocation(basicShader.ID, "windowSize");   // Window size uniform
     int loc2 = glGetUniformLocation(basicShader.ID, "time");         // Time
+    int loc3 = glGetUniformLocation(basicShader.ID, "cameraPosition");     // Mouse position
+
+    double xpos = 0.0, ypos = 0.0;  // Used for storing mouse position
+    Vec3 camPosition(0.0, 1.0, 0.0);
+    Vec3 camDirection(0.0, 0.0, -1.0);
+    Vec3 camRight(1.0, 0.0, 0.0);
+    Vec3 camUp(0.0, 1.0, 0.0);
 
     // Render loop
     while(display.IsOpen())
@@ -52,12 +60,30 @@ int main()
 
         if(basicShader.CheckChanged(vertexPath, fragmentPath))
             basicShader.UseShader();
+
+        // Moving around
+        float speed = 5.0 * display.deltaTime;
+        if(glfwGetKey(display.window, GLFW_KEY_W) == GLFW_PRESS)
+            camPosition += camDirection * speed;
+        if(glfwGetKey(display.window, GLFW_KEY_S) == GLFW_PRESS)
+            camPosition -= camDirection * speed;
+        if(glfwGetKey(display.window, GLFW_KEY_A) == GLFW_PRESS)
+            camPosition -= camRight * speed;
+        if(glfwGetKey(display.window, GLFW_KEY_D) == GLFW_PRESS)
+            camPosition += camRight * speed;
+        if(glfwGetKey(display.window, GLFW_KEY_SPACE) == GLFW_PRESS)
+            camPosition += camUp * speed;
+        if(glfwGetKey(display.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+            camPosition -= camUp * speed;
+
+        // Pass camera position to shader
+        glUniform3f(loc3, camPosition.x, camPosition.y, camPosition.z);
         
         // Pass screen coordinates to shader
-        glUniform2f(loc1, (float) WIDTH, (float) HEIGHT);
+        glUniform2f(loc1, (float)WIDTH, (float)HEIGHT);
 
         // Pass glfw time to shader
-        glUniform1f(loc2, (float) glfwGetTime());
+        glUniform1f(loc2, (float)glfwGetTime());
 
         display.Update();
     }
