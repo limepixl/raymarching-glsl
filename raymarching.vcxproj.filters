@@ -32,9 +32,6 @@
     <ClInclude Include="src\Display\display.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Math\math.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\Shader\shader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>

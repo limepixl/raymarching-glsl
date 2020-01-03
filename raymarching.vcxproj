@@ -151,7 +151,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Display\display.hpp" />
-    <ClInclude Include="src\Math\math.hpp" />
     <ClInclude Include="src\Shader\shader.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

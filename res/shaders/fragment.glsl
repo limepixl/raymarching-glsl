@@ -3,6 +3,9 @@ out vec4 color;
 uniform vec2 windowSize;
 uniform float time;
 uniform vec3 cameraPosition;
+uniform vec3 forward;
+uniform vec3 right;
+uniform vec3 up;
 
 const int MAXSTEPS = 500;
 const float MINDISTANCE = 0.01;
@@ -91,7 +94,11 @@ void main()
     vec2 uv = fragCoord - 0.5;
     uv.x *= windowSize.x / windowSize.y;
 
-    vec3 direction = normalize(vec3(uv.x, uv.y, -1));
+    float zoom = 1.0;
+    vec3 center = cameraPosition + forward * zoom;
+    vec3 intersection = center + uv.x * right + uv.y * up;
+
+    vec3 direction = intersection - cameraPosition;
 
     float dist = March(cameraPosition, direction);
     vec3 point = cameraPosition + dist*direction;
