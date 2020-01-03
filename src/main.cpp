@@ -68,13 +68,25 @@ int main()
         lastX = xpos; lastY = ypos;
         glfwGetCursorPos(display.window, &xpos, &ypos);
 
+        float sensitivity = 0.2f;
         float xoffset = float(xpos - lastX);
         float yoffset = float(lastY - ypos);
-        yaw += xoffset; pitch += yoffset;
+        yaw += xoffset * sensitivity; 
+        pitch += yoffset * sensitivity; 
 
-        glm::vec3 forward = glm::normalize(lookAt - camPosition);
-        glm::vec3 right = glm::cross(glm::vec3(0.0, 1.0, 0.0), forward);
-        glm::vec3 up = glm::cross(forward, right);
+        if(pitch > 89.0f)
+            pitch = 89.0f;
+        if(pitch < -89.0f)
+            pitch = -89.0f;
+
+        glm::vec3 front;
+        front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+        front.y = sin(glm::radians(pitch));
+        front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
+        glm::vec3 forward = glm::normalize(front);
+        glm::vec3 right = glm::normalize(glm::cross(forward, glm::vec3(0.0, 1.0, 0.0)));
+        glm::vec3 up = glm::normalize(glm::cross(right, forward));
 
         // Moving around
         float speed = 5.0f * (float)display.deltaTime;
@@ -91,18 +103,12 @@ int main()
         if(glfwGetKey(display.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
             camPosition -= up * speed;
 
-        glUniform3f(loc4, forward.x, forward.y, forward.z);
-        glUniform3f(loc5, right.x, right.y, right.z);
-        glUniform3f(loc6, up.x, up.y, up.z);
-
-        // Pass camera position to shader
-        glUniform3f(loc3, camPosition.x, camPosition.y, camPosition.z);
-        
-        // Pass screen coordinates to shader
-        glUniform2f(loc1, (float)WIDTH, (float)HEIGHT);
-
-        // Pass glfw time to shader
-        glUniform1f(loc2, (float)glfwGetTime());
+        glUniform3f(loc3, camPosition.x, camPosition.y, camPosition.z); // Camera position
+        glUniform3f(loc4, forward.x, forward.y, forward.z);             // Camera forward
+        glUniform3f(loc5, right.x, right.y, right.z);                   // Camera right
+        glUniform3f(loc6, up.x, up.y, up.z);                            // Camera up
+        glUniform1f(loc2, (float)glfwGetTime());                        // Time
+        glUniform2f(loc1, (float)WIDTH, (float)HEIGHT);                 // Screen size
 
         display.Update();
     }

@@ -21,7 +21,8 @@ mat2 Rotate(float angle)
 
 float sphereSDF(vec3 point, float radius)
 {
-    return length(mod(point + 0.5, 1.0) - 0.5) - radius;
+    //return length(mod(point + 0.5, 1.0) - 0.5) - radius;
+    return length(point) - radius;
 }
 
 float pillSDF(vec3 point, vec3 A, vec3 B, float radius)
@@ -50,9 +51,10 @@ float torusSDF(vec3 point, vec3 center, float r1, float r2)
 // Returns the distance to the closest hit
 float SceneDist(vec3 point)
 {	
-    float dist1 = sphereSDF(point, 0.2);
+    float dist1 = sphereSDF(point - vec3(0.0, 1.0, 0.0), 1.0);
+    float dist2 = point.y;
 
-    float minDist = dist1;
+    float minDist = min(dist1, dist2);
     return minDist;
 }
 
@@ -94,11 +96,10 @@ void main()
     vec2 uv = fragCoord - 0.5;
     uv.x *= windowSize.x / windowSize.y;
 
-    float zoom = 1.0;
-    vec3 center = cameraPosition + forward * zoom;
+    vec3 center = cameraPosition + forward;
     vec3 intersection = center + uv.x * right + uv.y * up;
 
-    vec3 direction = intersection - cameraPosition;
+    vec3 direction = normalize(intersection - cameraPosition);
 
     float dist = March(cameraPosition, direction);
     vec3 point = cameraPosition + dist*direction;
