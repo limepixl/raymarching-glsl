@@ -13,8 +13,8 @@ int main()
     Display display(WIDTH, HEIGHT);
 
     // Shader paths
-    const char* vertexPath = "../../../res/shaders/vertex.glsl";
-    const char* fragmentPath = "../../../res/shaders/fragment.glsl";
+    const char* vertexPath = "res/shaders/vertex.glsl";
+    const char* fragmentPath = "res/shaders/fragment.glsl";
 
     Shader basicShader;
     basicShader.LoadShader(vertexPath, fragmentPath);
@@ -46,8 +46,9 @@ int main()
     int loc2 = glGetUniformLocation(basicShader.ID, "time");         // Time
     int loc3 = glGetUniformLocation(basicShader.ID, "cameraPosition");     // Mouse position
 
+    double lastX, lastY;
     double xpos = 0.0, ypos = 0.0;  // Used for storing mouse position
-    Vec3 camPosition(0.0, 1.0, 0.0);
+    Vec3 camPosition(0.0, 1.0, 5.0);
     Vec3 camDirection(0.0, 0.0, -1.0);
     Vec3 camRight(1.0, 0.0, 0.0);
     Vec3 camUp(0.0, 1.0, 0.0);
@@ -58,11 +59,20 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 6);
 
-        if(basicShader.CheckChanged(vertexPath, fragmentPath))
+        if(basicShader.CheckChanged((wchar_t*)vertexPath, (wchar_t*)fragmentPath))
             basicShader.UseShader();
 
+        lastX = xpos; lastY = ypos;
+        glfwGetCursorPos(display.window, &xpos, &ypos);
+
+        float xoffset = float(xpos - lastX);
+        float yoffset = float(lastY - ypos);
+
+        // Looking around
+
+
         // Moving around
-        float speed = 5.0 * display.deltaTime;
+        float speed = 5.0f * (float)display.deltaTime;
         if(glfwGetKey(display.window, GLFW_KEY_W) == GLFW_PRESS)
             camPosition += camDirection * speed;
         if(glfwGetKey(display.window, GLFW_KEY_S) == GLFW_PRESS)

@@ -1,6 +1,7 @@
 #include "shader.hpp"
 #include <cstdio>
 #include <cstdlib>
+#include <Windows.h>
 #include <glad/glad.h>
 #include <ctime>
 
@@ -85,8 +86,7 @@ void Shader::UseShader()
 }
 
 // Windows implementation of the function below
-#include <Windows.h>
-bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
+bool Shader::CheckChanged(const wchar_t* vertexPath, const wchar_t* fragmentPath)
 {
     WIN32_FILE_ATTRIBUTE_DATA vertexData, fragmentData;
     GetFileAttributesEx(vertexPath, GetFileExInfoStandard, &vertexData);
@@ -98,19 +98,19 @@ bool Shader::CheckChanged(const char* vertexPath, const char* fragmentPath)
     ULARGE_INTEGER vertexLarge;
     vertexLarge.LowPart = vertexTime.dwLowDateTime;
     vertexLarge.HighPart = vertexTime.dwHighDateTime;
-    unsigned long currentVertexTime = vertexLarge.QuadPart;
+    ULONGLONG currentVertexTime = vertexLarge.QuadPart;
 
     ULARGE_INTEGER fragmentLarge;
     fragmentLarge.LowPart = fragmentTime.dwLowDateTime;
     fragmentLarge.HighPart = fragmentTime.dwHighDateTime;
-    unsigned long currentFragmentTime = fragmentLarge.QuadPart;
+    ULONGLONG currentFragmentTime = fragmentLarge.QuadPart;
 
     bool hasChanged = currentVertexTime != lastVertexTime || currentFragmentTime != lastFragmentTime;
     if(hasChanged)
     {
-        LoadShader(vertexPath, fragmentPath);
-        lastVertexTime = currentVertexTime;
-        lastFragmentTime = currentFragmentTime;
+        LoadShader((char*)vertexPath, (char*)fragmentPath);
+        lastVertexTime = (long)currentVertexTime;
+        lastFragmentTime = (long)currentFragmentTime;
     }
 
     return hasChanged;

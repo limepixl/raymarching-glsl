@@ -18,7 +18,7 @@ mat2 Rotate(float angle)
 
 float sphereSDF(vec3 point, float radius)
 {
-    return length(point) - radius;
+    return length(mod(point + 0.5, 1.0) - 0.5) - radius;
 }
 
 float pillSDF(vec3 point, vec3 A, vec3 B, float radius)
@@ -47,10 +47,9 @@ float torusSDF(vec3 point, vec3 center, float r1, float r2)
 // Returns the distance to the closest hit
 float SceneDist(vec3 point)
 {	
-    float torusDist = torusSDF(point - vec3(0.0, 0.5, -6.0), vec3(0.0, 1.0, -6.0), 1.0, 0.1);
-    float planeDist = point.y;
+    float dist1 = sphereSDF(point, 0.2);
 
-    float minDist = min(torusDist, planeDist);
+    float minDist = dist1;
     return minDist;
 }
 
@@ -88,8 +87,9 @@ vec3 GetNormal(vec3 point)
 
 void main()
 {
-    vec2 fragCoord = gl_FragCoord.xy ;
-    vec2 uv = (fragCoord - 0.5 * windowSize.xy) / windowSize.y;
+    vec2 fragCoord = gl_FragCoord.xy / windowSize;
+    vec2 uv = fragCoord - 0.5;
+    uv.x *= windowSize.x / windowSize.y;
 
     vec3 direction = normalize(vec3(uv.x, uv.y, -1));
 
@@ -98,8 +98,6 @@ void main()
 
     // Simple point light
     vec3 lightPos = vec3(0.0, 10.0, -1.0);
-    lightPos.x += 10.0 * sin(time);
-    lightPos.z += 10.0 * cos(time);
 
     vec3 lightDir = normalize(lightPos - point);
     vec3 normalVector = GetNormal(point);
