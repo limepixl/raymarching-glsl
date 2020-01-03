@@ -21,8 +21,12 @@ mat2 Rotate(float angle)
 
 float sphereSDF(vec3 point, float radius)
 {
-    //return length(mod(point + 0.5, 1.0) - 0.5) - radius;
     return length(point) - radius;
+}
+
+float infiniteSpheresSDF(vec3 point, float radius)
+{
+    return length(mod(point + 0.5, 1.0) - 0.5) - radius;
 }
 
 float pillSDF(vec3 point, vec3 A, vec3 B, float radius)
@@ -51,17 +55,18 @@ float torusSDF(vec3 point, vec3 center, float r1, float r2)
 // Returns the distance to the closest hit
 float SceneDist(vec3 point)
 {	
-    float dist1 = sphereSDF(point - vec3(0.0, 1.0, 0.0), 1.0);
-    float dist2 = point.y;
+    float dist1 = infiniteSpheresSDF(point, 0.2);
 
-    float minDist = min(dist1, dist2);
+    float minDist = dist1;
     return minDist;
 }
 
-float March(vec3 origin, vec3 direction)
+vec2 March(vec3 origin, vec3 direction)
 {
     float currentDistance = 0.0;
-    for(int i = 0; i < MAXSTEPS; i++)
+
+    int i;
+    for(i = 0; i < MAXSTEPS; i++)
     {
         vec3 point = origin + direction * currentDistance;
         float dist = SceneDist(point);
@@ -74,7 +79,7 @@ float March(vec3 origin, vec3 direction)
             break;
     }
 
-    return currentDistance;
+    return vec2(currentDistance, float(i));
 }
 
 // TODO: Visualize this
@@ -101,11 +106,15 @@ void main()
 
     vec3 direction = normalize(intersection - cameraPosition);
 
-    float dist = March(cameraPosition, direction);
+    vec2 marchResult = March(cameraPosition, direction);
+    float dist = marchResult.x;
+    float iteration = marchResult.y;
+    float glow = iteration / MAXSTEPS;
+
     vec3 point = cameraPosition + dist*direction;
 
     // Simple point light
-    vec3 lightPos = vec3(0.0, 10.0, -1.0);
+    vec3 lightPos = vec3(0.0, 10.5, -1.0);
 
     vec3 lightDir = normalize(lightPos - point);
     vec3 normalVector = GetNormal(point);
@@ -116,10 +125,11 @@ void main()
     // Raymarch towards the light to see if point is in shadow
     // Raising the point that the raymarch starts from because the 
     // marching ends right away if it starts at the found point from the last march.
-    float distToLight = March(point + normalVector * MINDISTANCE*2.0, normalize(lightPos - point));
+    vec2 march2Result = March(point + normalVector * MINDISTANCE*2.0, normalize(lightPos - point));
+    float distToLight = march2Result.x;
     if(distToLight < length(lightPos - point))
         diffuse *= 0.1;
 
     vec3 objectColor = vec3(1.0);
-    color = vec4(diffuse * objectColor, 1.0);
+    color = vec4(glow, glow, glow, 1.0) * vec4(objectColor, 1.0);
 }

@@ -54,8 +54,8 @@ int main()
     double lastX, lastY;
     double xpos = 0.0, ypos = 0.0;  // Used for storing mouse position
     glm::vec3 camPosition(0.0, 1.0, 5.0);
-    glm::vec3 lookAt(0.0, 0.0, 0.0);
 
+    float sensitivity = 0.2f;
     float yaw = 0.0;
     float pitch = 0.0;
 
@@ -67,8 +67,7 @@ int main()
 
         lastX = xpos; lastY = ypos;
         glfwGetCursorPos(display.window, &xpos, &ypos);
-
-        float sensitivity = 0.2f;
+        
         float xoffset = float(xpos - lastX);
         float yoffset = float(lastY - ypos);
         yaw += xoffset * sensitivity; 
@@ -99,9 +98,9 @@ int main()
         if(glfwGetKey(display.window, GLFW_KEY_D) == GLFW_PRESS)
             camPosition += right * speed;
         if(glfwGetKey(display.window, GLFW_KEY_SPACE) == GLFW_PRESS)
-            camPosition += up * speed;
+            camPosition += glm::vec3(0.0, 1.0, 0.0) * speed;
         if(glfwGetKey(display.window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-            camPosition -= up * speed;
+            camPosition -= glm::vec3(0.0, 1.0, 0.0) * speed;
 
         glUniform3f(loc3, camPosition.x, camPosition.y, camPosition.z); // Camera position
         glUniform3f(loc4, forward.x, forward.y, forward.z);             // Camera forward
