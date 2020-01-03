@@ -3,3 +3,4 @@ build
 .vs
 /x64
 /raymarching.vcxproj.user
+raymarching/x64
